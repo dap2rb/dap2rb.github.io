@@ -487,7 +487,7 @@ gen pmiss_sport=100*miss_sport
 capture drop state_ss
 gen state_ss=state
 replace state_ss=23 if state_ss==33
-replace state_ss=state+100 if state==9 | state==36 | state==50 
+replace state_ss=state_ss+100 if state!=9 & state!=36 & state!=50 
 
 capture drop miss_county
 bysort county: egen miss_county=max(miss)
@@ -524,17 +524,22 @@ save $mid/analysis_1, replace
  
 
 use $mid/analysis_1, clear
+capture drop Ncounty
+keep if !missing(emp)
+bysort county: gen Ncounty=_n
+tab state_ss if Ncounty==1
+
+use $mid/analysis_1, clear
 capture drop Ncounty_sport
 keep if !missing(emp_sport)
 bysort county: gen Ncounty_sport=_n
-tab state if Ncounty_sport==1
+tab state_ss if Ncounty_sport==1
 
 use $mid/analysis_1, clear
 capture drop Ncounty_pop
 keep if !missing(emp_sport) | !missing(emp)
-bysort county: gen Ncounty_sport=_n
-tab state_ss if Ncounty_sport==1
-
+bysort county: gen Ncounty_pop=_n
+tab state_ss if Ncounty_pop==1
 
 use $mid/analysis_1, clear
  
